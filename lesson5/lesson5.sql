@@ -69,24 +69,25 @@ ORDER BY value DESC;
 
 /*4. Из таблицы users необходимо извлечь пользователей, родившихся в августе и мае. Месяцы заданы в виде списка английских названий (may, august)
 */
-ALTER TABLE users ADD COLUMN bith_date VARCHAR(100);
+ALTER TABLE users ADD COLUMN bith_date DATE; /*изменила тип данных*/
 ALTER TABLE users DROP COLUMN bith_date; 
 DESCRIBE users;
-UPDATE users SET bith_date='5-MAY-1985' WHERE id=2;
-UPDATE users SET bith_date='5-AUGUST-1985' WHERE id=3;
-UPDATE users SET bith_date='5-SEPTEMBER-1985' WHERE id=4;
-UPDATE users SET bith_date='5-OCTOBER-1985' WHERE id=5;
-UPDATE users SET bith_date='5-NOVEMBER-1985' WHERE id=6;
-UPDATE users SET bith_date='5-DECEMBER-1985' WHERE id=7;
-UPDATE users SET bith_date='3-MAY-1995' WHERE id=8;
-UPDATE users SET bith_date='18-AUGUST-1986' WHERE id=9;
-UPDATE users SET bith_date='5-OCTOBER-1985' WHERE id=10;
-UPDATE users SET bith_date='7-MAY-1985' WHERE id=11;
-SELECT *FROM users;
+UPDATE users SET bith_date='1985-05-05' WHERE id=2;
+UPDATE users SET bith_date='1985-08-05' WHERE id=3;
+UPDATE users SET bith_date='1985-09-05' WHERE id=4;
+UPDATE users SET bith_date='1985-10-05' WHERE id=5;
+UPDATE users SET bith_date='1985-11-05' WHERE id=6;
+UPDATE users SET bith_date='1985-12-05' WHERE id=7;
+UPDATE users SET bith_date='1995-05-03' WHERE id=8;
+UPDATE users SET bith_date='1986-08-18' WHERE id=9;
+UPDATE users SET bith_date='1985-10-5' WHERE id=10;
+UPDATE users SET bith_date='1985-05-07' WHERE id=11;
 
-(SELECT *FROM users WHERE bith_date LIKE '%MAY%')
- UNION 
-(SELECT *FROM users WHERE bith_date LIKE '%AUGUST%'); 
+/*новый запрос*/
+SELECT  u.id, u.user_name, date_format(bith_date, '%d.%M.%Y') as bithday FROM users AS u
+WHERE month(bith_date)='05' or month(bith_date)='08' ;
+
+
 
 /*5.  Из таблицы catalogs извлекаются записи при помощи запроса. Из таблицы catalogs извлекаются записи при помощи запроса. SELECT * FROM catalogs WHERE id IN (5, 1, 2); Отсортируйте записи в порядке, заданном в списке IN.
 ; Отсортируйте записи в порядке, заданном в списке IN.
@@ -124,6 +125,10 @@ UPDATE user SET age=35 WHERE id=9;
 UPDATE user SET age=27 WHERE id=10;
 
 SELECT AVG(age) FROM user WHERE id>0;
+
+/*вариант с расчетом возраста*/
+
+SELECT Avg((year(current_date())-year(bith_date))-(right(current_date,5)<right(`bith_date`,5))) AS age FROM users;
 
 /*2. Подсчитайте количество дней рождения, которые приходятся на каждый из дней недели. Следует учесть, что необходимы дни недели текущего года, а не года рождения.*/
 ALTER TABLE user ADD COLUMN bithday DATE;
@@ -169,4 +174,4 @@ INSERT INTO tab1 (`value`) VALUE (5);
 
 -- exp(ln(1*2*3*4*5)) = 1*2*3*4*5 = exp(ln(1)+ln(2) + ln(3) + ln(4) + ln(5)) --
 
-SELECT exp(SUM(log(value))) FROM tab1;
+SELECT round(exp(SUM(log(value)))) FROM tab1; /*добавила округление*/
